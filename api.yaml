@@ -1,0 +1,572 @@
+openapi: 3.0.3
+info:
+  title: LinkDump API
+  version: 1.0.0
+  description: >
+    API for the tutorial LinkDump project. See the guide for the implementation
+    at https://www.ravitadinada.com/blog/tech/linkdump-api-guide .
+    See sample queries here: https://www.postman.com/rtadinada/workspace/linkdump/collection/23659884-402ecdc2-fbcd-4471-bea1-c75eb83a3e31?action=share&creator=23659884 .
+security:
+  - BasicAuth: []
+servers:
+    - url: https://linkdump.ravitadinada.com/api
+      description: Reference implementation
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      description: >
+        Register a new user with a username, password, and name. Calls will
+        error if the username is already taken or if a parameter is missing.
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 1
+                  maxLength: 30
+                  description: Can only contain letters, numbers, and underscores
+                password:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+              example:
+                username: TimeTraveler1985
+                password: pa$$word
+                name: Marty McFly
+      responses:
+        "201":
+          description: User successfully created
+          headers:
+            Location:
+              description: Path to the created user
+              schema:
+                type: string
+        "400":
+          description: Invalid parameters to create user (e.g. username taken)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              examples:
+                exampleError:
+                  $ref: "#/components/examples/exampleError"
+  /me:
+    get:
+      summary: Get logged-in user
+      responses:
+        "200":
+          "description": Logged-in user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+              example:
+                id: c4f6abce4b2f
+                createdAt: 1645495008
+                username: TimeTraveler1985
+                name: Marty McFly
+        "401":
+          $ref: "#/components/responses/unauthenticatedResponse"
+  /me/messages:
+    get:
+      summary: Get logged-in user's messages
+      parameters:
+        - $ref: "#/components/parameters/offsetParameter"
+        - $ref: "#/components/parameters/limitParameter"
+      responses:
+        "200":
+          "description": Logged-in user's messages
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/collectionProperties"
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/message"
+              example:
+                offset: 0
+                limit: 2
+                totalCount: 95
+                results:
+                  - id: aaafbd818207
+                    createdAt: 1645495008
+                    senderId: 79fca92fd021
+                    body: >
+                      Comment on post "Looking for Plutoniom": Plutoniom is a highly
+                      controlled substance, be careful
+                  - id: 297f422cb128
+                    createdAt: 1645495000
+                    senderId: dccf7d101d3e
+                    body: >
+                      Comment on post "Looking for Plutoniom": i heard a local terrorist
+                      group might have some"
+        "400":
+          $ref: "#/components/responses/invalidCollectionQueryParamsResponse"
+        "401":
+          $ref: "#/components/responses/unauthenticatedResponse"
+  /users:
+    get:
+      summary: Query all users
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/offsetParameter"
+        - $ref: "#/components/parameters/limitParameter"
+        - in: query
+          name: ids
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          description: IDs to filter on; max 50
+      responses:
+        "200":
+          description: Array of users
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/collectionProperties"
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/user"
+              example:
+                offset: 0
+                limit: 2
+                totalCount: 95
+                results:
+                  - id: c4f6abce4b2f
+                    createdAt: 1645495008
+                    username: TimeTraveler1985
+                    name: Marty McFly
+                  - id: a1497857a122
+                    createdAt: 1645495000
+                    username: DeloreanEnthusiast3
+                    name: Doc Brown
+        "400":
+          $ref: "#/components/responses/invalidCollectionQueryParamsResponse"
+        "401":
+          $ref: "#/components/responses/unauthenticatedResponse"
+  /users/{userId}:
+    get:
+      summary: Get a user
+      security: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+              example:
+                id: c4f6abce4b2f
+                createdAt: 1645495008
+                username: TimeTraveler1985
+                name: Marty McFly
+        "401":
+          $ref: "#/components/responses/unauthenticatedResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                message: "No user with username biff_tannen."
+  /posts:
+    get:
+      summary: Query all posts
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/offsetParameter"
+        - $ref: "#/components/parameters/limitParameter"
+      responses:
+        "200":
+          description: Array of posts
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/collectionProperties"
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/post"
+              example:
+                offset: 0
+                limit: 2
+                totalCount: 95
+                results:
+                  - id: d39132132e72
+                    createdAt: 1645495008
+                    posterId: a1497857a122
+                    title: Looking for Plutoniom
+                    link: https://www.example.com/doc-brown/contact-me
+                  - id: ab3d94eb0d3f
+                    createdAt: 1645495000
+                    posterId: c4f6abce4b2f
+                    tite: Pinhead concert!
+                    link: https://www.example.com/events/pinhead
+        "400":
+          $ref: "#/components/responses/invalidCollectionQueryParamsResponse"
+        "401":
+          $ref: "#/components/responses/unauthenticatedResponse"
+    post:
+      summary: Create a post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                link:
+                  type: string
+                  minLength: 1
+                  maxLength: 150
+              example:
+                title: Looking for Plutoniom
+                link: https://www.example.com/doc-brown/contact-me
+      responses:
+        "201":
+          description: Post successfully created
+          headers:
+            Location:
+              description: Path to the created post
+              schema:
+                type: string
+        "400":
+          description: Invalid parameters to create post (e.g. field missing)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              examples:
+                exampleError:
+                  $ref: "#/components/examples/exampleError"
+        "401":
+          $ref: "#/components/responses/unauthenticatedResponse"
+  /post/{postId}:
+    get:
+      summary: Get a post
+      security: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/post"
+              example:
+                id: d39132132e72
+                posterId: a1497857a122
+                title: Looking for Plutoniom
+                link: https://www.example.com/doc-brown/contact-me
+        "401":
+          $ref: "#/components/responses/unauthenticatedResponse"
+        "404":
+          $ref: "#/components/responses/nonexistentPostResponse"
+  /post/{postId}/comments:
+    get:
+      summary: Query all the comments for a post
+      security: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/offsetParameter"
+        - $ref: "#/components/parameters/limitParameter"
+      responses:
+        "200":
+          description: List of comments for a post
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/collectionProperties"
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/comment"
+              example:
+                offset: 0
+                limit: 2
+                totalCount: 95
+                results:
+                  - id: 5600dfe5ddd6
+                    createdAt: 1645495008
+                    postId: d39132132e72
+                    commenterId: 79fca92fd021
+                    text: Plutoniom is a highly controlled substance, be careful
+                  - id: 5600dfe5ddd6
+                    createdAt: 1645495008
+                    postId: d39132132e72
+                    commenterId: dccf7d101d3e
+                    text: i heard a local terrorist group might have some
+        "400":
+          $ref: "#/components/responses/invalidCollectionQueryParamsResponse"
+        "401":
+          $ref: "#/components/responses/unauthenticatedResponse"
+        "404":
+          $ref: "#/components/responses/nonexistentPostResponse"
+    post:
+      summary: Create a comment on a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  minLength: 1
+                  maxLength: 5000
+              example:
+                text: Plutoniom is a highly controlled substance, be careful
+      responses:
+        "201":
+          description: Comment successfully created
+          headers:
+            Location:
+              description: Path to the created comment
+              schema:
+                type: string
+        "400":
+          description: Invalid parameters to create comment (e.g. field missing)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              examples:
+                exampleError:
+                  $ref: "#/components/examples/exampleError"
+        "401":
+          $ref: "#/components/responses/unauthenticatedResponse"
+        "404":
+          $ref: "#/components/responses/nonexistentPostResponse"
+  /post/{postId}/comments/{commentId}:
+    get:
+      summary: Get a comment under a post
+      security: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Comment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/comment"
+              example:
+                id: 5600dfe5ddd6
+                createdAt: 1645495008
+                postId: d39132132e72
+                commenterId: 79fca92fd021
+                text: Plutoniom is a highly controlled substance, be careful
+        "401":
+          $ref: "#/components/responses/unauthenticatedResponse"
+        "404":
+          description: >
+            Comment not found. Either the comment doesn't exist, the post
+            doesn't exist, or the comment isn't associated with the specified
+            post.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                message: No comment 67890 for post 12345.
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+  parameters:
+    offsetParameter:
+      in: query
+      name: offset
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Number of items to skip before querying results.
+    limitParameter:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 10
+      description: Number of items to return. Maximum 50.
+  schemas:
+    errorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    collectionProperties:
+      type: object
+      properties:
+        offset:
+          type: integer
+          description: >
+            The offset of the first result. Should be the same as the supplied `offset`
+            query parameter.
+        limit:
+          type: integer
+          description: >
+            The limit used for the results. Should be the same as the supplied `limit`
+            query parameter.
+        totalCount:
+          type: integer
+          description: >
+            Total number of results in the entire collection. Will be greater than or
+            equal to the length of the results list.
+    user:
+      type: object
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: integer
+          description: The UNIX timestamp of creation in seconds
+        username:
+          type: string
+        name:
+          type: string
+    post:
+      type: object
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: integer
+          description: The UNIX timestamp of creation in seconds
+        posterId:
+          type: string
+          description: User ID of the poster
+        title:
+          type: string
+        link:
+          type: string
+    comment:
+      type: object
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: integer
+          description: The UNIX timestamp of creation in seconds
+        postId:
+          type: string
+          description: ID of the post the comment is associated with
+        commenterId:
+          type: string
+          description: User ID of the commenter
+        text:
+          type: string
+    message:
+      type: object
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: integer
+          description: The UNIX timestamp of creation in seconds
+        senderId:
+          type: string
+          description: User ID of the sender
+        body:
+          type: string
+  responses:
+    unauthenticatedResponse:
+      description: User not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/errorResponse"
+          examples:
+            unauthenticatedError:
+              $ref: "#/components/examples/unauthenticatedError"
+    invalidCollectionQueryParamsResponse:
+      description: Collection query parameters not valid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/errorResponse"
+          examples:
+            limitTooHigh:
+              $ref: "#/components/examples/invalidCollectionQueryParamError"
+    nonexistentPostResponse:
+      description: Post not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/errorResponse"
+          example:
+            message: No post 12345.
+  examples:
+    exampleError:
+      value:
+        message: Error message.
+    unauthenticatedError:
+      value:
+        message: Error authenticating user.
+    invalidCollectionQueryParamError:
+      value:
+        message: Supplied limit greater than max allowed (50).
