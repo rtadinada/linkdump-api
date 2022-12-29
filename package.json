@@ -1,6 +1,6 @@
 {
   "name": "linkdump-api-dryrun",
-  "version": "0.0.112",
+  "version": "0.0.113",
   "description": "",
   "author": "",
   "license": "ISC",
@@ -8,5 +8,9 @@
   "scripts": {
     "start": "node src/app/run.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "4.18.2",
+    "mongodb": "4.13.0"
   }
 }
