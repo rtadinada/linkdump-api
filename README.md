@@ -7,4 +7,4 @@ Follow along here with the guide to check your code against mine (or to just
 steal if you're lazy like me).
 
 This commit contains the implementation up to:
-[Part 1](https://www.ravitadinada.com/blog/tech/linkdump-api-guide-pt1) Section 2.1 - Code structure set up
+[Part 1](https://www.ravitadinada.com/blog/tech/linkdump-api-guide-pt1) Section 2.2 - Adding Express
