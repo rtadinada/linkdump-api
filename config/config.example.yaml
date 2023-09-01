@@ -1,0 +1,7 @@
+port: 8080
+mongoDbConnection:
+    user: user
+    password: password
+    host: host
+    port: 27017
+    authenticationDb: admin

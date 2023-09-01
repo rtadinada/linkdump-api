@@ -7,4 +7,4 @@ Follow along here with the guide to check your code against mine (or to just
 steal if you're lazy like me).
 
 This commit contains the implementation up to:
-[Part 1](https://www.ravitadinada.com/blog/tech/linkdump-api-guide-pt1) Section 2.3 - Connecting to your database
+[Part 2](https://www.ravitadinada.com/blog/tech/linkdump-api-guide-pt2) Section 1.2 - Parsing the config file

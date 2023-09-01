@@ -1,6 +1,6 @@
 {
   "name": "linkdump-api-dryrun",
-  "version": "0.0.123",
+  "version": "0.0.212",
   "description": "",
   "author": "",
   "license": "ISC",
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "express": "4.18.2",
+    "js-yaml": "4.1.0",
     "mongodb": "4.13.0"
   }
 }
