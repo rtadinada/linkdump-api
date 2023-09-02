@@ -7,4 +7,4 @@ Follow along here with the guide to check your code against mine (or to just
 steal if you're lazy like me).
 
 This commit contains the implementation up to:
-[Part 2](https://www.ravitadinada.com/blog/tech/linkdump-api-guide-pt2) Section 1.2 - Parsing the config file
+[Part 2](https://www.ravitadinada.com/blog/tech/linkdump-api-guide-pt2) Section 1.3 - Supplying the config file to the server

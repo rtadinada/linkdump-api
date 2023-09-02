@@ -1,17 +1,18 @@
 {
   "name": "linkdump-api-dryrun",
-  "version": "0.0.212",
+  "version": "0.0.213",
   "description": "",
   "author": "",
   "license": "ISC",
   "type": "module",
   "scripts": {
-    "start": "node src/app/run.js",
+    "start-dev": "node src/app/run.js -c config/config.dev.yaml",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "express": "4.18.2",
     "js-yaml": "4.1.0",
-    "mongodb": "4.13.0"
+    "mongodb": "4.13.0",
+    "yargs": "17.7.2"
   }
 }
